@@ -1,0 +1,69 @@
+class HashTable:
+    def __init__(self, size):
+        self.size = size
+        self.keys = [None] * size
+        self.values = [None] * size
+
+    def hash_function(self, key):
+        return hash(key) % self.size
+
+    def insert(self, key, value):
+        index = self.hash_function(key)
+        i = 1
+
+        while self.keys[index] is not None:
+            # Quadratic probing: use a quadratic function to find the next slot
+            index = (index + i**2) % self.size
+            i += 1
+
+        # Insert the key and value in the first available slot
+        self.keys[index] = key
+        self.values[index] = value
+
+    def search(self, key):
+        index = self.hash_function(key)
+        i = 1
+
+        while self.keys[index] is not None:
+            if self.keys[index] == key:
+                return self.values[index]
+            
+            # Quadratic probing: use a quadratic function to find the next slot
+            index = (index + i**2) % self.size
+            i += 1
+
+        raise KeyError(f"Key '{key}' not found")
+
+    def delete(self, key):
+        index = self.hash_function(key)
+        i = 1
+
+        while self.keys[index] is not None:
+            if self.keys[index] == key:
+                # Delete the key and value, marking the slot as empty
+                self.keys[index] = None
+                self.values[index] = None
+                return
+            
+            # Quadratic probing: use a quadratic function to find the next slot
+            index = (index + i**2) % self.size
+            i += 1
+
+        raise KeyError(f"Key '{key}' not found")
+
+
+# Example usage:
+hash_table = HashTable(size=10)
+
+hash_table.insert("one", 1)
+hash_table.insert("two", 2)
+hash_table.insert("three", 3)
+
+print(hash_table.search("one"))  # Output: 1
+print(hash_table.search("four"))  # Raises KeyError
+
+hash_table.delete("two")
+try:
+    print(hash_table.search("two"))
+except KeyError as e:
+    print(e)  # Output: Key 'two' not found
